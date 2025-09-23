@@ -1,16 +1,16 @@
 import torch
 from torch import Tensor
 
-from pointnet.model.transform_net import TransformNet
+from pointnet.model.base_point_net import BasePointNet
 
 
-class TestTransformNet:
+class TestBasePointNet:
     def test_init(self):
         """
-        Test that we can initialise a TransformNet network.
+        Test that we can initialise a BasePointNet network.
         """
-        net = TransformNet(3, 3)
-        assert isinstance(net, TransformNet)
+        net = BasePointNet(3)
+        assert isinstance(net, BasePointNet)
 
     def test_forward(self):
         """
@@ -22,11 +22,11 @@ class TestTransformNet:
         x = torch.rand((8, 3, 200), device=device, dtype=dtype)
 
         # Try to run inference
-        net = TransformNet(3, 3).to(device=device, dtype=dtype)
+        net = BasePointNet(3).to(device=device, dtype=dtype)
         output = net.forward(x)
 
         # Check the output
         assert isinstance(output, Tensor)
         assert output.device == device
         assert output.dtype == dtype
-        assert output.shape == (x.shape[0], net.output_dim, net.output_dim)
+        assert output.shape == (x.shape[0], 1024)

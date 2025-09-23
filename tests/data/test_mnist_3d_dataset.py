@@ -1,6 +1,7 @@
+from pathlib import Path
+
 import pytest
 import torch
-from pathlib import Path
 from torchvision.datasets import MNIST
 
 from pointnet.data import MNIST3DDataset
@@ -40,5 +41,6 @@ class TestMNIST3DDataset:
         points, label = dataset[0]
 
         assert isinstance(points, torch.Tensor)
-        assert points.shape == (num_points, 3)
-        assert isinstance(label, int)
+        assert points.shape == (3, num_points)
+        assert isinstance(label, torch.Tensor)
+        assert label.shape == ()

@@ -2,13 +2,18 @@
 name = "pointnet"
 version = "0.1.0"
 description = "Default template for PDM package"
-authors = [
-    {name = "Kyle Newman", email = "kyle@thenewmans.com.au"},
+authors = [{ name = "Kyle Newman", email = "kyle@thenewmans.com.au" }]
+dependencies = [
+  "notebook>=7.4.5",
+  "torch>=2.7.1",
+  "torchvision>=0.22.1",
+  "matplotlib>=3.10.6",
+  "pydantic>=2.11.9",
+  "tqdm>=4.67.1",
 ]
-dependencies = ["notebook>=7.4.5", "torch>=2.7.1", "torchvision>=0.22.1", "matplotlib>=3.10.6"]
 requires-python = ">=3.11"
 readme = "README.md"
-license = {text = "None"}
+license = { text = "None" }
 
 [build-system]
 requires = ["pdm-backend"]
@@ -19,7 +24,4 @@ build-backend = "pdm.backend"
 distribution = true
 
 [dependency-groups]
-dev = [
-    "pytest>=8.4.2",
-    "ipympl>=0.9.7",
-]
+dev = ["pytest>=8.4.2", "ipympl>=0.9.7"]

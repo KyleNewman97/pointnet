@@ -1,5 +1,5 @@
 import torch
-from torch import nn, Tensor
+from torch import Tensor, nn
 from torch.nn.functional import relu
 
 
@@ -41,8 +41,7 @@ class TransformNet(nn.Module):
         x = x.squeeze(2)
 
         # Apply fully connected layers
-        x = self.fc1(x)
-        x = relu(self.bn4(x))
+        x = relu(self.bn4(self.fc1(x)))
         x = relu(self.bn5(self.fc2(x)))
         x = self.fc3(x)
 

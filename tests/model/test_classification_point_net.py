@@ -1,0 +1,52 @@
+import torch
+from torch import Tensor
+
+from pointnet.model import ClassificationPointNet
+
+
+class TestClassificationPointNet:
+    def test_init(self):
+        """
+        Test that we can initialise a ClassificationPointNet network.
+        """
+        net = ClassificationPointNet(200, 3, 10)
+        assert isinstance(net, ClassificationPointNet)
+
+    def test_device(self):
+        """
+        Test the device property correctly reports the device.
+        """
+        device = torch.device("cpu")
+        net = ClassificationPointNet(200, 3, 10).to(device=device)
+        assert net.device == device
+
+    def test_dtype(self):
+        """
+        Test the dtype property correctly reports the dtype.
+        """
+        dtype = torch.float32
+        net = ClassificationPointNet(200, 3, 10).to(dtype=dtype)
+        assert net.dtype == dtype
+
+    def test_forward(self):
+        """
+        Test that we can perform inference.
+        """
+        # Create dummy input
+        device = torch.device("cpu")
+        dtype = torch.float32
+        num_points = 200
+        x = torch.rand((8, 3, num_points), device=device, dtype=dtype)
+
+        # Try to run inference
+        num_classes = 10
+        net = ClassificationPointNet(num_points, 3, num_classes).to(
+            device=device, dtype=dtype
+        )
+        output = net.forward(x)
+
+        # Check the output
+        assert isinstance(output, Tensor)
+        assert output.device == device
+        assert output.dtype == dtype
+        assert output.shape == (x.shape[0], num_classes)

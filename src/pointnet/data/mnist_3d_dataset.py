@@ -1,5 +1,5 @@
-import torch
 import numpy as np
+import torch
 from torch import Tensor
 from torch.utils.data import Dataset
 from torchvision.datasets import MNIST
@@ -17,7 +17,7 @@ class MNIST3DDataset(Dataset):
     def __len__(self):
         return len(self.dataset)
 
-    def __getitem__(self, index: int) -> tuple[Tensor, int]:
+    def __getitem__(self, index: int) -> tuple[Tensor, Tensor]:
         image, label = self.dataset[index]
 
         # Find all white pixels
@@ -41,4 +41,5 @@ class MNIST3DDataset(Dataset):
         noise = np.expand_dims(noise, 1)
         points = np.hstack([points, noise]).astype(np.float32)
         points_tensor = torch.tensor(points, device=self.device, dtype=self.dtype)
-        return points_tensor, label
+        points_tensor = points_tensor.permute(1, 0)
+        return points_tensor, torch.tensor(label, device=self.device)
