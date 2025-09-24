@@ -1,3 +1,6 @@
+from pathlib import Path
+from tempfile import TemporaryDirectory
+
 import torch
 from torch import Tensor
 
@@ -27,6 +30,24 @@ class TestClassificationPointNet:
         dtype = torch.float32
         net = ClassificationPointNet(200, 3, 10).to(dtype=dtype)
         assert net.dtype == dtype
+
+    def test_save_load(self):
+        """
+        Test we can correctly save and load the model.
+        """
+        device = torch.device("cpu")
+        dtype = torch.float32
+
+        model = ClassificationPointNet(200, 3, 10).to(device=device, dtype=dtype)
+        with TemporaryDirectory() as temp_dir:
+            # Save the model
+            file = Path(temp_dir) / "model.pt"
+            model.save(file)
+
+            # Try to load the model
+            loaded_model = ClassificationPointNet.load(file)
+
+        assert isinstance(loaded_model, ClassificationPointNet)
 
     def test_forward(self):
         """
