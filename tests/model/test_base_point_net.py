@@ -23,10 +23,15 @@ class TestBasePointNet:
 
         # Try to run inference
         net = BasePointNet(3).to(device=device, dtype=dtype)
-        output = net.forward(x)
+        global_feats, trans_feats = net.forward(x)
 
         # Check the output
-        assert isinstance(output, Tensor)
-        assert output.device == device
-        assert output.dtype == dtype
-        assert output.shape == (x.shape[0], 1024)
+        assert isinstance(global_feats, Tensor)
+        assert global_feats.device == device
+        assert global_feats.dtype == dtype
+        assert global_feats.shape == (x.shape[0], 1024)
+
+        assert isinstance(trans_feats, Tensor)
+        assert trans_feats.device == device
+        assert trans_feats.dtype == dtype
+        assert trans_feats.shape == (x.shape[0], 64, x.shape[2])

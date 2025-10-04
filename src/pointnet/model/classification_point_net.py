@@ -116,8 +116,8 @@ class ClassificationPointNet(nn.Module, MetaLogger):
         logits:
             The classification logits, with shape `(batch_size, num_classes)`.
         """
-        features = self.backbone.forward(points)
-        return self.head(features)
+        gloabl_features, _ = self.backbone.forward(points)
+        return self.head(gloabl_features)
 
     def _create_data_loaders(
         self, config: TrainingConfig

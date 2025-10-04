@@ -25,12 +25,22 @@ class BasePointNet(nn.Module):
         self.conv5 = nn.Conv1d(128, 1024, kernel_size=1)
         self.bn5 = nn.BatchNorm1d(1024)
 
-    def forward(self, x: Tensor) -> Tensor:
+    def forward(self, x: Tensor) -> tuple[Tensor, Tensor]:
         """
         Parameters
         ----------
         x:
             Tensor data of shape `(batch_size, channels, sequence_length)`.
+
+        Returns
+        -------
+        global_features:
+            A tensor containing the global features of the points (post MaxPool). With
+            shape: `(batch_size, 1024)`.
+
+        trans_features:
+            A tensor containing the transformed features. With shape: `(batch_size, 64,
+            sequence_length)`.
         """
         num_points = x.shape[2]
 
@@ -44,14 +54,14 @@ class BasePointNet(nn.Module):
 
         # Apply a transform to features
         feature_transform = self.feature_transform(x)
-        x = torch.bmm(feature_transform, x)
+        trans_features = torch.bmm(feature_transform, x)
 
         # Pass through second MLP
-        x = relu(self.bn3(self.conv3(x)))
+        x = relu(self.bn3(self.conv3(trans_features)))
         x = relu(self.bn4(self.conv4(x)))
         x = relu(self.bn5(self.conv5(x)))
 
         x = nn.MaxPool1d(num_points)(x)
-        x = x.squeeze(2)
+        global_features = x.squeeze(2)
 
-        return x
+        return global_features, trans_features
