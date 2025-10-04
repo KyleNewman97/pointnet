@@ -12,9 +12,9 @@ from pointnet.structs import TrainingConfig
 from pointnet.utils import MetaLogger
 
 
-class ClassificationPointNet(nn.Module, MetaLogger):
+class SegmentationPointNet(nn.Module, MetaLogger):
     """
-    A multi-class classification model that operates on point cloud data. This model is
+    A multi-class segmentation model that operates on point cloud data. This model is
     based on [PointNet](https://arxiv.org/pdf/1612.00593).
     """
 
@@ -23,7 +23,6 @@ class ClassificationPointNet(nn.Module, MetaLogger):
         num_points: int,
         point_dimensions: int,
         num_classes: int,
-        dropout: float = 0.3,
     ):
         nn.Module.__init__(self)
         MetaLogger.__init__(self)
@@ -31,18 +30,19 @@ class ClassificationPointNet(nn.Module, MetaLogger):
         self.num_points = num_points
         self.point_dimensions = point_dimensions
         self.num_classes = num_classes
-        self.dropout = dropout
 
         self.backbone = BasePointNet(point_dimensions)
         self.head = nn.Sequential(
-            nn.Linear(1024, 512),
+            nn.Conv1d(1088, 512, kernel_size=1),
             nn.BatchNorm1d(512),
             nn.ReLU(),
-            nn.Linear(512, 256),
+            nn.Conv1d(512, 256, kernel_size=1),
             nn.BatchNorm1d(256),
             nn.ReLU(),
-            nn.Dropout(dropout),
-            nn.Linear(256, num_classes),
+            nn.Conv1d(256, 128, kernel_size=1),
+            nn.BatchNorm1d(128),
+            nn.ReLU(),
+            nn.Conv1d(128, num_classes, kernel_size=1),
         )
 
     @property
@@ -68,13 +68,12 @@ class ClassificationPointNet(nn.Module, MetaLogger):
                 "num_points": self.num_points,
                 "point_dimensions": self.point_dimensions,
                 "num_classes": self.num_classes,
-                "dropout": self.dropout,
             },
             file,
         )
 
     @classmethod
-    def load(cls, file: Path) -> "ClassificationPointNet":
+    def load(cls, file: Path) -> "SegmentationPointNet":
         """
         Load the model from the specified location.
 
@@ -96,7 +95,6 @@ class ClassificationPointNet(nn.Module, MetaLogger):
             model_state["num_points"],
             model_state["point_dimensions"],
             model_state["num_classes"],
-            model_state["dropout"],
         )
         model.load_state_dict(model_state["model"])
         model.eval()
@@ -114,10 +112,16 @@ class ClassificationPointNet(nn.Module, MetaLogger):
         Returns
         -------
         logits:
-            The classification logits, with shape `(batch_size, num_classes)`.
+            The per point logits, with shape `(batch_size, num_classes,
+            sequence_length)`.
         """
-        global_features, _ = self.backbone.forward(points)
-        return self.head(global_features)
+        global_features, trans_features = self.backbone.forward(points)
+
+        # Concatenate global and transform features
+        global_features = global_features.unsqueeze(2).repeat(1, 1, 200)
+        features = torch.concat((trans_features, global_features), dim=1)
+
+        return self.head(features)
 
     def _create_data_loaders(
         self, config: TrainingConfig
@@ -159,6 +163,7 @@ class ClassificationPointNet(nn.Module, MetaLogger):
         self.logger.info(f"Training model: {config.run_name}")
 
         # Create data loaders
+        # TODO: Implement data loaders specifically for the segmentation problem
         train_loader, valid_loader = self._create_data_loaders(config)
 
         # Create the optimiser and learning rate scheduler
