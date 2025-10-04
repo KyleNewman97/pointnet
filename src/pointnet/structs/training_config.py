@@ -1,7 +1,8 @@
 from pathlib import Path
 from uuid import uuid4
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field
+from torch.utils.data import Dataset
 
 
 class TrainingConfig(BaseModel):
@@ -9,7 +10,8 @@ class TrainingConfig(BaseModel):
     The training configuration to use when training a model.
     """
 
-    dataset_dir: Path
+    train_dataset: Dataset
+    valid_dataset: Dataset
     root_dir: Path
     run_name: str = Field(default_factory=lambda: f"{uuid4()}")
     epochs: int = Field(default=100)
@@ -26,3 +28,5 @@ class TrainingConfig(BaseModel):
         folder.mkdir(exist_ok=True)
 
         return folder
+
+    model_config = ConfigDict(arbitrary_types_allowed=True)

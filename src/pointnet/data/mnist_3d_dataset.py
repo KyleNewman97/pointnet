@@ -20,7 +20,7 @@ class MNIST3DDataset(Dataset):
         self.device = device
         self.dtype = dtype
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.dataset)
 
     def __getitem__(self, index: int) -> tuple[Tensor, Tensor]:
