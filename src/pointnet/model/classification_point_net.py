@@ -5,10 +5,8 @@ import torch
 from torch import Tensor, nn, optim
 from torch.nn.functional import cross_entropy
 from torch.utils.data import DataLoader
-from torchvision.datasets import MNIST
 from tqdm import tqdm
 
-from pointnet.data import MNIST3DDataset, RandomRotationTransform
 from pointnet.model.base_point_net import BasePointNet
 from pointnet.structs import TrainingConfig
 from pointnet.utils import MetaLogger
@@ -141,25 +139,10 @@ class ClassificationPointNet(nn.Module, MetaLogger):
             Validation dataset loader.
         """
         # Create a training loader
-        train_mnist = MNIST(config.dataset_dir, train=True, download=True)
-        train_dataset = MNIST3DDataset(
-            train_mnist,
-            self.num_points,
-            self.device,
-            self.dtype,
-            [RandomRotationTransform()],
-        )
-        train_loader = DataLoader(train_dataset, config.batch_size, shuffle=True)
+        train_loader = DataLoader(config.train_dataset, config.batch_size, shuffle=True)
 
         # Create a validation loader
-        valid_mnist = MNIST(config.dataset_dir, train=False, download=True)
-        valid_dataset = MNIST3DDataset(
-            valid_mnist,
-            self.num_points,
-            self.device,
-            self.dtype,
-        )
-        valid_loader = DataLoader(valid_dataset, config.batch_size, shuffle=True)
+        valid_loader = DataLoader(config.valid_dataset, config.batch_size, shuffle=True)
 
         return train_loader, valid_loader
 
