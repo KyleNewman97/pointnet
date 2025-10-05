@@ -5,7 +5,7 @@
 groups = ["default", "dev"]
 strategy = ["inherit_metadata"]
 lock_version = "4.5.0"
-content_hash = "sha256:bbeb2c557524f783df8a8dc0c9be5a1d6df8044bb64f7fc86b592be6990bbec6"
+content_hash = "sha256:e3318b3ac32501154ae97e0bf9afbf80938602283619c1c6b9865dd7d50d8ff1"
 
 [[metadata.targets]]
 requires_python = ">=3.11"
@@ -2803,6 +2803,20 @@ groups = ["default", "dev"]
 files = [
     {file = "traitlets-5.14.3-py3-none-any.whl", hash = "sha256:b74e89e397b1ed28cc831db7aea759ba6640cb3de13090ca145426688ff1ac4f"},
     {file = "traitlets-5.14.3.tar.gz", hash = "sha256:9ed0579d3502c94b4b3732ac120375cda96f923114522847de4b3bb98b96b6b7"},
+]
+
+[[package]]
+name = "trimesh"
+version = "4.8.3"
+requires_python = ">=3.8"
+summary = "Import, export, process, analyze and view triangular meshes."
+groups = ["default"]
+dependencies = [
+    "numpy>=1.20",
+]
+files = [
+    {file = "trimesh-4.8.3-py3-none-any.whl", hash = "sha256:f9f1622ecac5f3bed5b65d3a748bb536481f52cd4e4e120e0b637cabe6cf1542"},
+    {file = "trimesh-4.8.3.tar.gz", hash = "sha256:d2a1974efccb0737a1faac14d69740c644bb6738a99c790c1df752fe72c2a759"},
 ]
 
 [[package]]

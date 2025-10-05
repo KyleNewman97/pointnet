@@ -1,7 +1,9 @@
 from collections import defaultdict
 from pathlib import Path
 
+import numpy as np
 import torch
+import trimesh
 from pydantic import BaseModel
 from torch import Tensor
 from torch.utils.data import Dataset
@@ -115,35 +117,12 @@ class ModelNet40Dataset(Dataset, MetaLogger):
                 `(3, desired_points)`
         """
 
-        with open(file, "r") as fp:
-            # Ensure the first line contains "OFF"
-            first_line = fp.readline().strip()
-            if "OFF" not in first_line:
-                raise RuntimeError(f"Invalid first line in OFF file {file}.")
+        mesh = trimesh.load_mesh(file)
+        indices = np.random.randint(0, mesh.vertices.shape[0], (desired_points,))
+        points = mesh.vertices[indices, :]
 
-            # Read counts
-            if first_line == "OFF":
-                # When the first line only contains OFF read the next line to get count
-                num_points, _, _ = fp.readline().strip().split(" ")
-            else:
-                # If the first line contains more than OFF then it also contains the
-                # num points
-                first_line = first_line.replace("OFF", "")
-                num_points, _, _ = first_line.split(" ")
-            num_points = int(num_points)
-
-            # Read in points
-            points = torch.zeros((3, num_points), device=device, dtype=dtype)
-            for idx in range(num_points):
-                coords = fp.readline().strip().split(" ")
-                for coord_idx, coord in enumerate(coords):
-                    points[coord_idx, idx] = float(coord)
-
-        # Randomly sample points to maximum number of points
-        indices = torch.randint(0, num_points, (desired_points,), device=device)
-        points = points[:, indices]
-
-        return points
+        points = torch.tensor(points, device=device, dtype=dtype)
+        return points.permute((1, 0))
 
     def __len__(self) -> int:
         return len(self.samples)
