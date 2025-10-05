@@ -35,7 +35,7 @@ if __name__ == "__main__":
 
     # Initialise the model
     net = ClassificationPointNet(num_points, point_dims, num_classes)
-    net = net.to(device=device, dtype=dtype)
+    net.to(device=device, dtype=dtype)
 
     # Train the model
     config = TrainingConfig(
